@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Exchange History";
+}
+
+<div class="flex-column" style="display: flex; flex-direction: column;">
+    @foreach (var item in ViewBag.Items)
+    {
+    <div class="flex-row" style="display: flex; align-items: center;">
+        <div style="margin-right: 20px">
+            @item.Date
+        </div>
+        <div style="margin-right: 20px">
+            <div style="margin-right: 5px">
+                @item.FirstCurrencyCode
+            </div>
+            <div>
+                @item.FirstCurrencyAmount
+            </div>
+        </div>
+        <div style="margin-right: 20px">
+            <div style="margin-right: 5px">
+                @item.SecondCurrencyCode
+            </div>
+            <div>
+                @item.SecondCurrencyAmount
+            </div>
+        </div>
+        </div>
+    }
+</div>

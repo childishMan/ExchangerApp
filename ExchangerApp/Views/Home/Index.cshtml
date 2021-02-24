@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    var Currencies = new[]
+    {
+        "GBP",
+        "EUR",
+        "USD",
+        "CHF"
+    };
+}
+
+<div class="flex-row container justify-content-between">
+    <div class="flex-row">
+        <input id="FirstCurrencyAmount"/>
+        <select id="FirstCurrencyCode">
+        @foreach (var item in Currencies)
+        {
+            <option value="@item">@item</option>
+        }
+        </select>
+    </div>
+    <div>
+        <input id="SecondCurrencyAmount" />
+        <select id="SecondCurrencyCode">
+            @foreach (var item in Currencies)
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+    <div id="result">
+    </div>
+    <div>
+        <button onclick="getRate()">Exchange</button>
+    </div>
+</div>
+
+<script>
+    function getRate() {
+        var firstCurrency = $('#FirstCurrencyCode option:selected').first().val();
+        var secondCurrency = $('#SecondCurrencyCode option:selected').first().val();
+
+        if (firstCurrency === secondCurrency) {
+            alert("Can't be same currencies");
+            return;
+        }
+
+        var firstCurrencyAmount = $("#FirstCurrencyAmount").first().val();
+        var secondCurrencyAmount = $('#SecondCurrencyAmount').first().val();
+
+        console.log(firstCurrencyAmount);
+        console.log(secondCurrencyAmount);
+
+        if (!firstCurrencyAmount && !secondCurrencyAmount) {
+            alert("Enter at least one number toe exchange");
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ExchangeEndpoint","Home")',
+            data:{
+                FirstCurrencyCode: firstCurrency,
+                FirstCurrencyAmount: firstCurrencyAmount,
+                SecondCurrencyCode: secondCurrency,
+                SecondCurrencyAmount:secondCurrencyAmount
+            },
+            dataType:'json',
+            success: function (result) {
+                console.log(result);
+                $('#result').first().text((firstCurrencyAmount ? firstCurrencyAmount : secondCurrency) + " * " + result.rate + " = " + (firstCurrencyAmount ? firstCurrencyAmount : secondCurrency) * result.rate);
+
+                $("#FirstCurrencyAmount").first().val(result.firstCurrencyAmount);
+                $("#SecondCurrencyAmount").first().val(result.secondCurrencyAmount);
+            },
+            error: function(error) {
+                alert('error occured');
+            }
+
+        });
+    }
+</script>
