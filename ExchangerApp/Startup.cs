@@ -1,3 +1,4 @@
+using ExchangerApp.Facades;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +22,10 @@ namespace ExchangerApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
             services.AddTransient<IExchangeService, ExchangeService>();
             services.AddTransient<IDbService, DbService>();
+            services.AddTransient<IExchangeFacade, ExchangeFacade>();
 
             services.AddDbContext<AppDbContext>(o =>
             {

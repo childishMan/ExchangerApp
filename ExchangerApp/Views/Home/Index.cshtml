@@ -68,13 +68,13 @@
             dataType:'json',
             success: function (result) {
                 console.log(result);
-                $('#result').first().text((firstCurrencyAmount ? firstCurrencyAmount : secondCurrency) + " * " + result.rate + " = " + (firstCurrencyAmount ? firstCurrencyAmount : secondCurrency) * result.rate);
+                $('#result').first().text("Exchanged by rate "+result.rate);
 
                 $("#FirstCurrencyAmount").first().val(result.firstCurrencyAmount);
                 $("#SecondCurrencyAmount").first().val(result.secondCurrencyAmount);
             },
             error: function(error) {
-                alert('error occured');
+                alert(error);
             }
 
         });

@@ -4,20 +4,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using ExchangerApp.Facades;
 using ExchangerApp.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace ExchangerApp.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IExchangeService _exchangeService;
         private readonly IDbService _dbService;
+        private readonly IExchangeFacade _exchangeFacade;
 
-        public HomeController(ILogger<HomeController> logger,IExchangeService exchangeService,IDbService dbService)
+        public HomeController(ILogger<HomeController> logger, IExchangeFacade exchangeFacade, IDbService dbService)
         {
             _logger = logger;
-            _exchangeService = exchangeService ?? throw new ArgumentNullException(nameof(exchangeService));
+            _exchangeFacade = exchangeFacade ?? throw new ArgumentNullException(nameof(exchangeFacade));
             _dbService = dbService ?? throw new ArgumentNullException(nameof(dbService));
         }
 
@@ -41,23 +43,34 @@ namespace ExchangerApp.Controllers
                 return BadRequest();
             }
 
-            var res = await _exchangeService.ExchangeMoney(model);
-
-            if (res != null)
+            try
             {
-                var md = new HistoryModel()
+                var res = await _exchangeFacade.ExchangeMoney(model);
+
+                if (res != null)
                 {
-                    Date = DateTime.Now,
-                    FirstCurrencyAmount = res.FirstCurrencyAmount,
-                    FirstCurrencyCode = res.FirstCurrencyCode,
-                    SecondCurrencyAmount = res.SecondCurrencyAmount,
-                    SecondCurrencyCode = res.SecondCurrencyCode
-                };
+                    var md = new HistoryModel()
+                    {
+                        Date = DateTime.Now,
+                        FirstCurrencyAmount = res.FirstCurrencyAmount,
+                        FirstCurrencyCode = res.FirstCurrencyCode,
+                        SecondCurrencyAmount = res.SecondCurrencyAmount,
+                        SecondCurrencyCode = res.SecondCurrencyCode
+                    };
 
-                _dbService.AddEntry(md);
+                    _dbService.AddEntry(md);
+                }
+
+                return Ok(res);
             }
-
-            return Ok(res);
+            catch (ArgumentNullException x)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, x.Message);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

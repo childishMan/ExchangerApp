@@ -5,6 +5,6 @@ namespace ExchangerApp.Services
 {
     public interface IExchangeService
     {
-        Task<ExchangeModel> ExchangeMoney(ExchangeModel model);
+        Task<float> GetRate(string mainCurrency, string secondaryCurrency);
     }
 }
